@@ -1,0 +1,10 @@
+^E:\VISUAL STUDIO PROJECT\RTHD\LIBS\CUDAUTIL\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SE:/visual studio project/RTHD" "-BE:/visual studio project/RTHD/build" --check-stamp-file "E:/visual studio project/RTHD/build/libs/CUDAUtil/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

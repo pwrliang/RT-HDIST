@@ -1,0 +1,7 @@
+E:/visual studio project/RTHD/build/CMakeFiles/ALL_BUILD.dir
+E:/visual studio project/RTHD/build/CMakeFiles/ZERO_CHECK.dir
+E:/visual studio project/RTHD/build/libs/CMakeFiles/optixBaseLib.dir
+E:/visual studio project/RTHD/build/libs/geometry/CMakeFiles/geometryLib.dir
+E:/visual studio project/RTHD/build/libs/CUDAUtil/CMakeFiles/cudaLib.dir
+E:/visual studio project/RTHD/build/libs/hausdorff/CMakeFiles/hausdorffLib.dir
+E:/visual studio project/RTHD/build/demo/demo1/CMakeFiles/RTHDdemo.dir
