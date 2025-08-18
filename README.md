@@ -1,6 +1,10 @@
 # RT-HDIST: Ray-Tracing Core-based Hausdorff Distance Computation  
-This repository contains the implementation of the following paper: "RT-HDIST: Ray-Tracing Core-based Hausdorff Distance Computation" (Pacific Graphics 2025).  
+<img width="2795" height="972" alt="teaser2" src="https://github.com/user-attachments/assets/837b0084-bf68-4514-ad93-9adb48cda953" />
+This repository contains the implementation of the following paper: "RT-HDIST: Ray-Tracing Core-based Hausdorff Distance Computation" (Pacific Graphics 2025).   
 
+  
+> **Abstract**  
+> The Hausdorff distance is a fundamental metric with widespread applications across various fields. However, its computation remains computationally expensive, especially for large-scale datasets. This work targets exact point-to-point Hausdorff distance on point sets. In this work, we present RT-HDIST, the first Hausdorff distance algorithm accelerated by ray-tracing cores (RT-cores). By reformulating the Hausdorff distance problem as a series of nearest-neighbor searches and introducing a novel quantized voxel-index space, RT-HDIST achieves significant reductions in computational overhead while maintaining exact results. Extensive benchmarks demonstrate up to a two-order-of-magnitude speedup over prior state-of-the-art methods, underscoring RT-HDIST's potential for real-time and large-scale applications. 
 
 ## Installation  
 ```
