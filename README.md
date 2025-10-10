@@ -40,10 +40,13 @@ RTHDdemo.exe -path 2 "Dataset/ObjectA.obj" "Dataset/ObjectB.obj" -grid 8 8 -tr 0
 -->
 ## Citation  
 ```
-@article{kim2025rt,
-  title={RT-HDIST: Ray-Tracing Core-based Hausdorff Distance Computation},
-  author={Kim, YoungWoo and Lee, Jaehong and Kim, Duksu},
-  journal={arXiv preprint arXiv:2504.13436},
-  year={2025}
+@article{10.1111:cgf.70229,
+journal = {Computer Graphics Forum},
+title = {{RT-HDIST: Ray-Tracing Core-based Hausdorff Distance Computation}},
+author = {Kim, YoungWoo and Lee, Jaehong and Kim, Duksu},
+year = {2025},
+publisher = {The Eurographics Association and John Wiley & Sons Ltd.},
+ISSN = {1467-8659},
+DOI = {10.1111/cgf.70229}
 }
 ```
