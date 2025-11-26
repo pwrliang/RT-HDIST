@@ -11,6 +11,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "3rdParty/stb_image_write.h"
 
+#include <algorithm>
 #include <set>
 #include <iostream>
 #include <filesystem>

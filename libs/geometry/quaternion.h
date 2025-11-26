@@ -1,6 +1,7 @@
 #pragma once
 #include "3rdParty/helper_math.h"
 #include <memory>
+#include <cstring>
 typedef float4 quat;
 
 void quat2rom(quat q, float* rom);

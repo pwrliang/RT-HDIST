@@ -1,5 +1,6 @@
 #include "PointCloud.h"
 #include "3rdParty/IO.h"
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <unordered_map>
