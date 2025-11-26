@@ -1,0 +1,3 @@
+[submodule "demo/demo1/rply"]
+	path = demo/demo1/rply
+	url = https://github.com/diegonehab/rply.git

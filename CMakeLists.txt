@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.8)
 
-project ("RTHD" LANGUAGES CXX CUDA)
+project ("RTHD" LANGUAGES C CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,6 +20,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(optix)
 set(OptiX_INCLUDE_DIR "${optix_SOURCE_DIR}/include")
+find_package(ITK CONFIG REQUIRED COMPONENTS ITKCommon ITKIOImageBase ITKIONIFTI)
+include(${ITK_USE_FILE})
 
 add_library(optix_common INTERFACE)
 target_include_directories(optix_common INTERFACE

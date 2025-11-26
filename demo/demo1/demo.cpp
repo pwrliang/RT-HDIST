@@ -2,6 +2,8 @@
 #include "3rdParty/helper_math.h"
 #include "OptiX_Base.h"
 #include "rtHausdorffQCluster.h"
+#include "img_loader.h"
+#include "ply_loader.h"
 
 #include "3rdParty/TimeChecker.h"
 #include "3rdParty/Logger.h"
@@ -40,6 +42,57 @@ float3 randomDir() {
 
 	return dir;
 }
+bool endsWith(const std::string& fullString, const std::string& ending) {
+	// 1. Check if the ending is longer than the full string.
+	if (ending.size() > fullString.size()) {
+		return false;
+	}
+
+	// 2. Compare the ending part of fullString with ending.
+	// std::string::compare(pos, len, str) compares the substring of
+	// fullString starting at pos (and with length len) with str.
+	// The comparison starts at: fullString.size() - ending.size()
+	// The length of the substring to compare is: ending.size()
+	return fullString.compare(
+		fullString.size() - ending.size(), // Start position
+		ending.size(),                     // Length to compare
+		ending                             // String to compare against
+	) == 0; // compare returns 0 if the strings are equal
+}
+HDGPUParam<HDMODE::POINT> ReadPoints(const std::string& inputFilePath,
+	float3 boxTranslate = {0,0,0}) {
+	HDGPUParam<HDMODE::POINT> points;
+	if (endsWith(inputFilePath, ".obj")) {
+		Object_t hA = IO::read<Object_t, SPIN::OBJ>(inputFilePaths[0]);
+		for (auto &v: hA.model->meshes[0]->vertex) {
+			v += boxTranslate;
+		}
+		cudaMalloc(&points.vert, sizeof(float3) * hA.model->meshes[0]->vertex.size());
+		upload(hA.model->meshes[0]->vertex, points);
+		points.vSize = hA.model->meshes[0]->vertex.size();
+	} else if (endsWith(inputFilePath, ".ply")) {
+		auto h_points = LoadPLY(inputFilePath);
+		for (auto &p:h_points) {
+			p += boxTranslate;
+		}
+		cudaMalloc(&points.vert, sizeof(float3) * h_points.size());
+		upload(h_points, points);
+		points.vSize = h_points.size();
+	} else if (endsWith(inputFilePath, ".nii")) {
+		itk::Size<3> img_size;
+		auto h_points = LoadImage(inputFilePath, img_size);
+		for (auto &p:h_points) {
+			p += boxTranslate;
+		}
+		cudaMalloc(&points.vert, sizeof(float3) * h_points.size());
+		upload(h_points, points);
+		points.vSize = h_points.size();
+	} else {
+		throw std::invalid_argument("Unsupported input file type");
+	}
+	return points;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -56,34 +109,23 @@ int main(int argc, char* argv[])
 
     SPIN::Logger log;
 
-    Object_t hA = IO::read<Object_t, SPIN::OBJ>(inputFilePaths[0]);
 
 
-	HDGPUParam<HDMODE::POINT> dA;
+	HDGPUParam<HDMODE::POINT> dA = ReadPoints(inputFilePaths[0]);
 	HDGPUParam<HDMODE::POINT> dB;
-	cudaMalloc(&dA.vert, sizeof(float3) * hA.model->meshes[0]->vertex.size());
-	upload(hA.model->meshes[0]->vertex, dA);
 
 	float3 boxTranslate = { 0,0,0 };
 	OptixAabb aabb = computeAABB_device(dA.vert, dA.vSize);
 	float3 aabbSize = aabb2size(aabb);
 
-	if (globalParams["obj_count"] == 1){
+	if (globalParams["obj_count"] == 1) {
 		if (globalParams["translate_ratio"]) {
 			globalTransform = globalTransformRatio * make_float3(aabbSize.x, 0, 0);
 			boxTranslate = globalTransform;
-	    }
-			Object_t hB = IO::read<Object_t, SPIN::OBJ>(inputFilePaths[0]);
-		    for(auto &v : hB.model->meshes[0]->vertex){
-				v += boxTranslate;
-			}
-			cudaMalloc(&dB.vert, sizeof(float3) * hB.model->meshes[0]->vertex.size());
-			upload(hB.model->meshes[0]->vertex, dB);
-	    }
-	else{
-		Object_t hB = IO::read<Object_t, SPIN::OBJ>(inputFilePaths[1]);
-		cudaMalloc(&dB.vert, sizeof(float3) * hB.model->meshes[0]->vertex.size());
-		upload(hB.model->meshes[0]->vertex, dB);
+		}
+		dB = ReadPoints(inputFilePaths[0], boxTranslate);
+	} else {
+		dB = ReadPoints(inputFilePaths[1]);
 	}
 
 	log.data["00_source_count"].push_back((int)dA.vSize);
@@ -126,17 +168,19 @@ int main(int argc, char* argv[])
 	auto RTQclusterTimes = SPIN::TimeCheck([&]() {
 		float3 tempCand1, tempCand2;
 		float HD1 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dA, dB, cand1, cand2, sqrt(3), globalParams["grid_1"], timeParam);
-		float HD2 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dB, dA, tempCand1, tempCand2, sqrt(3), globalParams["grid_2"], timeParam);
-		std::cout << HD1 << ", " << HD2 << std::endl;
+		// float HD2 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dB, dA, tempCand1, tempCand2, sqrt(3), globalParams["grid_2"], timeParam);
+		// std::cout << HD1 << ", " << HD2 << std::endl;
 
-		if (HD2 > HD1) {
-			cand1 = tempCand1;
-			cand2 = tempCand2;
-		}
+		// if (HD2 > HD1) {
+		// 	cand1 = tempCand1;
+		// 	cand2 = tempCand2;
+		// }
 
-		HD = fmaxf(HD1, HD2);
+		// HD = fmaxf(HD1, HD2);
+		std::cout << "HD1 " << HD1 << std::endl;
+		HD = HD1;
     });
-    
+
 	log.data["04_HD"].push_back(HD);
 	log.data["05_Performance(ms)"].push_back(RTQclusterTimes);
 

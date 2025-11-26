@@ -1152,7 +1152,7 @@ inline __host__ __device__ uint4 max(uint4 a, uint4 b)
 {
     return make_uint4(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z), max(a.w, b.w));
 }
-
+#if 0
 ////////////////////////////////////////////////////////////////////////////////
 // lerp
 // - linear interpolation between a and b, based on value t in [0, 1] range
@@ -1174,6 +1174,7 @@ inline __device__ __host__ float4 lerp(float4 a, float4 b, float t)
 {
     return a + t * (b - a);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // clamp
