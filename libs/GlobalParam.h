@@ -15,6 +15,7 @@ extern std::string loggerPath;
 extern float3 globalTransform;
 extern float globalTransformRatio;
 extern std::vector<std::string> inputFilePaths;
+extern std::string serialize_prefix;
 
 void verifyArguments(int argc, char* argv[]);
 
@@ -119,6 +120,11 @@ void verifyArguments(int argc, char* argv[]) {
 	}
 	else {
 		globalParams["mode"] = 0;
+	}
+
+	it = std::find(args.begin(), args.end(), "-serialize");
+	if (it != args.end()) {
+		serialize_prefix = *(it + 1);
 	}
 }
 #endif

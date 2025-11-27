@@ -4,6 +4,7 @@
 #include "rtHausdorffQCluster.h"
 #include "img_loader.h"
 #include "ply_loader.h"
+#include "wkt_loader.h"
 
 #include "3rdParty/TimeChecker.h"
 #include "3rdParty/Logger.h"
@@ -27,6 +28,7 @@ float3 globalTransform;
 float globalTransformRatio;
 
 std::vector<std::string> inputFilePaths;
+std::string serialize_prefix;
 
 void buildQClusterShader();
 
@@ -81,6 +83,14 @@ HDGPUParam<HDMODE::POINT> ReadPoints(const std::string& inputFilePath,
 	} else if (endsWith(inputFilePath, ".nii")) {
 		itk::Size<3> img_size;
 		auto h_points = LoadImage(inputFilePath, img_size);
+		for (auto &p:h_points) {
+			p += boxTranslate;
+		}
+		cudaMalloc(&points.vert, sizeof(float3) * h_points.size());
+		upload(h_points, points);
+		points.vSize = h_points.size();
+	} else if (endsWith(inputFilePath, ".wkt")) {
+		auto h_points = LoadPoints(inputFilePath, serialize_prefix);
 		for (auto &p:h_points) {
 			p += boxTranslate;
 		}

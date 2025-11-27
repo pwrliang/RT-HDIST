@@ -2,7 +2,8 @@
   "name": "rt-hdist",
   "version": "1.0",
   "dependencies": [
-    "itk"
+    "itk",
+    "boost-geometry"
   ],
   "builtin-baseline": "120deac3062162151622ca4860575a33844ba10b"
 }
