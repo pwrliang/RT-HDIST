@@ -1,5 +1,5 @@
 #pragma once
-#include "3rdParty/optix7support.h"
+#include <optix.h>
 
 enum OptiXHDistOptimizeState {
     FILTERING,
@@ -13,6 +13,8 @@ struct OptiXHDistParam{
     float3* target;
     float3* representative;
     unsigned int* targetIDX;
+    unsigned int* total_hits;
+    unsigned int* total_points;
     float* distance;
 
     OptixAabb targetBound;

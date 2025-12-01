@@ -69,7 +69,7 @@ OptiXHDProgram::OptiXHDProgram(OptiXProgramCompileOption programOption) : OptiXP
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------//
-float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUParam<HDMODE::POINT> B, float3& cand1, float3& cand2, float _eps, BYTE bitCount, std::map<std::string, float>& timeParam) {
+float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUParam<HDMODE::POINT> B, float3& cand1, float3& cand2, float _eps, BYTE bitCount, std::map<std::string, float>& timeParam, bool profiling) {
     AABBCluster target;
     OptixAabb targetAABB = computeAABB_device(B.vert, B.vSize);
     OptixAabb sourceAABB = computeAABB_device(A.vert, A.vSize);
@@ -123,7 +123,23 @@ float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUPara
     OptixAabb* aabbBuffer;
     cudaMalloc(&aabbBuffer, sizeof(OptixAabb) * target.number_of_cluster);
 
+    uint32_t* total_hits;
+
+    cudaMalloc(&total_hits, sizeof(uint32_t));
+    cudaMemset(total_hits, 0, sizeof(uint32_t));
+
+    uint32_t* total_points;
+    cudaMalloc(&total_points, sizeof(uint32_t));
+    cudaMemset(total_points, 0, sizeof(uint32_t));
+
     OptiXHDistParam nnparam;
+    if (profiling) {
+        nnparam.total_hits = total_hits;
+        nnparam.total_points = total_points;
+    } else {
+        nnparam.total_hits = nullptr;
+        nnparam.total_points = nullptr;
+    }
     nnparam.querySize = remains;
     nnparam.representative = gpuRepresentative;
     nnparam.targetBound = targetAABB;
@@ -269,6 +285,16 @@ float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUPara
         cudaFree(reduced);
     }
 
+    if (profiling) {
+        uint32_t h_total_hits;
+        cudaMemcpy(&h_total_hits, total_hits, sizeof(uint32_t), cudaMemcpyDeviceToHost);
+        uint32_t h_total_points;
+        cudaMemcpy(&h_total_points, total_points, sizeof(uint32_t), cudaMemcpyDeviceToHost);
+        timeParam["TotalHits"] = h_total_hits;
+        timeParam["TotalPoints"] = h_total_points;
+    }
+    cudaFree(total_hits);
+    cudaFree(total_points);
     cudaFree(aabbBuffer);
     cudaFree(queries);
     cudaFree(gpuRepresentative);

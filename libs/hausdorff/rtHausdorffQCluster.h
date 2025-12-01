@@ -41,7 +41,7 @@ public:
 	size_t tSize = 0;
 };
 
-float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUParam<HDMODE::POINT> B, float3& cand1, float3& cand2, float _eps, BYTE bitCount, std::map<std::string, float>& timeParam);
+float qclusterHD(OptiXHDProgram& program, HDGPUParam<HDMODE::POINT> A, HDGPUParam<HDMODE::POINT> B, float3& cand1, float3& cand2, float _eps, BYTE bitCount, std::map<std::string, float>& timeParam, bool profiling);
 
 void upload(std::vector<float3> &HostData, HDGPUParam<HDMODE::POINT>& DeviceData);
 void download(HDGPUParam<HDMODE::POINT>& DeviceData, std::vector<float3> & HostData);

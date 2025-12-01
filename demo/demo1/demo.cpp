@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
 
 	auto RTQclusterTimes = SPIN::TimeCheck([&]() {
 		float3 tempCand1, tempCand2;
-		float HD1 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dA, dB, cand1, cand2, sqrt(3), globalParams["grid_1"], timeParam);
+		float HD1 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dA, dB, cand1, cand2, sqrt(3), globalParams["grid_1"], timeParam, globalParams["profiling"]);
 		// float HD2 = qclusterHD(static_cast<OptiXHDProgram&>(*optixGlobalParams.programList["QCluster"]), dB, dA, tempCand1, tempCand2, sqrt(3), globalParams["grid_2"], timeParam);
 		// std::cout << HD1 << ", " << HD2 << std::endl;
 
@@ -197,6 +197,9 @@ int main(int argc, char* argv[])
 	log.data["05__01_index_time"].push_back(timeParam["IndexSpaceBuildTime"]);
 	log.data["05__02_filtering_time"].push_back(timeParam["FilteringTime"]);
 	log.data["05__03_computing_time"].push_back(timeParam["ComputingTime"]);
+
+	log.data["06__01_total_hits"].push_back(timeParam["TotalHits"]);
+	log.data["06__02_total_points"].push_back(timeParam["TotalPoints"]);
 
 	log.data["08_cand1_x"].push_back(cand1.x);
 	log.data["08_cand1_y"].push_back(cand1.y);

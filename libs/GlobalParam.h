@@ -126,6 +126,8 @@ void verifyArguments(int argc, char* argv[]) {
 	if (it != args.end()) {
 		serialize_prefix = *(it + 1);
 	}
+	it = std::find(args.begin(), args.end(), "-profiling");
+	globalParams["profiling"] = it != args.end();
 }
 #endif
 

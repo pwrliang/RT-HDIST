@@ -1,6 +1,13 @@
 #include "OptiXGlobalHelper.h"
 #include "params.h"
 
+/*
+My compiling command:
+cd shader
+nvcc --machine=64 --ptx --generate-code arch=compute_75,code=sm_75 --use_fast_math --relocatable-device-code=true --generate-line-info -Wno-deprecated-gpu-targets __shader__hd__qcluster__.cu -ccbin "/usr/bin/" -o __shader__hd__qcluster__.ptx -I"OptixPath" -I"/local/storage/liang/.clion/RT-HDIST/build/_deps/optix-src/include" -I"/local/storage/liang/.clion/RT-HDIST/libs" -I"/local/storage/liang/.clion/RT-HDIST/libs/hausdorff"
+*/
+
+
 extern "C" __constant__ OptiXHDistParam optixLaunchParams;
 
 enum { SURFACE_RAY_TYPE = 0, RAY_TYPE_COUNT };
@@ -91,6 +98,9 @@ extern "C" __global__ void __anyhit__radiance() {
 extern "C" __global__ void __intersection__radiance() {
     Payload_t& prd = *(Payload_t*)getPRD<Payload_t>();
 
+    if (optixLaunchParams.total_hits != nullptr) {
+        atomicAdd(optixLaunchParams.total_hits, 1);
+    }
     if (optixLaunchParams.state == FILTERING && prd.terminated) {
         return;
     }
@@ -115,6 +125,9 @@ extern "C" __global__ void __intersection__radiance() {
                     prd.rawMinDist = rawdist;
                     prd.targetIdx = i;
                 }
+            }
+            if (optixLaunchParams.total_points != nullptr) {
+                atomicAdd(optixLaunchParams.total_points, last - optixLaunchParams.clusterInfo[primIdx]);
             }
         }
         else {

@@ -2,6 +2,7 @@
 #include <optix_device.h>
 #include <cuda_runtime.h>
 #include <vector_types.h>
+#include <cstdint>
 
 #include "3rdParty/helper_math.h"
 
